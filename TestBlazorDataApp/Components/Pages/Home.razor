@@ -1,0 +1,29 @@
+﻿@inherits HomeBase
+@rendermode InteractiveServer
+@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app. Your number is @(YourNumber).
+
+<form>
+    <input @bind="FirstUser.Id" disabled />
+    <input @bind="FirstUser.UserName" placeholder="UserName" />
+    <input @bind="FirstUser.Email" placeholder="Email" />
+    <button type="submit" @onclick="OnSave">Save</button>
+
+    @if(SaveSuccess == true)
+    {
+        <span class="text-success">Good</span>
+    }
+    else if (SaveSuccess == false)
+    {
+        <span class="text-danger">Bad</span>
+    }
+</form>
+
+<p>
+    @TestService.GetEnv()
+</p>
