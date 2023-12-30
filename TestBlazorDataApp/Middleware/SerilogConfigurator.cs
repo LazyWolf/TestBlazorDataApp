@@ -1,4 +1,5 @@
 ﻿using Serilog;
+using System.Diagnostics;
 
 namespace TestBlazorDataApp.Middleware
 {
@@ -6,8 +7,8 @@ namespace TestBlazorDataApp.Middleware
     {
         public static void ConfigureLogging(this LoggerConfiguration cfg, HostBuilderContext ctx)
         {
-            var selfLogDir = ctx.Configuration["SerilogSelfLogDir"];
-            if (!String.IsNullOrWhiteSpace(selfLogDir))
+            var selfLogDir = ctx.Configuration["SerilogSelfLogDirectory"];
+            if (Debugger.IsAttached && !String.IsNullOrWhiteSpace(selfLogDir))
             {
                 ctx.ConfigureSelfLogging(selfLogDir);
             }
