@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using TestBlazorDataApp.Components;
 using TestBlazorDataApp.Data;
+using TestBlazorDataApp.Middleware;
 using TestBlazorDataApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +21,10 @@ builder.Services.AddDbContextFactory<DataContext>(opt =>
 // Configure Options
 builder.Services.Configure<ApplicationOptions>(builder.Configuration.GetSection(nameof(ApplicationOptions)));
 
+// Add logging with Serilog
+builder.Host.UseSerilog((context, configuration) => 
+    configuration.ConfigureLogging(context));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -31,7 +37,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseAuthorization();
 app.UseAntiforgery();
+app.UseSerilogRequestLogging();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

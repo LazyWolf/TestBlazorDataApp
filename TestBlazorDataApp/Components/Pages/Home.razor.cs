@@ -4,11 +4,8 @@ using TestBlazorDataApp.Services;
 
 namespace TestBlazorDataApp.Components.Pages
 {
-    public class HomeBase : ComponentBase
+    public class HomeBase : PageBase
     {
-        [Inject]
-        protected TestService TestService { get; set; } = new();
-
         [Parameter]
         public int Param { get; set; }
 
@@ -26,6 +23,7 @@ namespace TestBlazorDataApp.Components.Pages
         {
             try
             {
+                Logger.LogInformation("Hello World");
                 TestService.UpdateUser(FirstUser);
                 SaveSuccess = true;
             }
