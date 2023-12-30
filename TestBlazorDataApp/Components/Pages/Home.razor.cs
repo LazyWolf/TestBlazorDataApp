@@ -9,6 +9,9 @@ namespace TestBlazorDataApp.Components.Pages
         [Inject]
         protected TestService TestService { get; set; } = new();
 
+        [Parameter]
+        public int Param { get; set; }
+
         public int YourNumber { get; set; }
         public User FirstUser { get; set; } = new();
         public bool? SaveSuccess { get; set; }

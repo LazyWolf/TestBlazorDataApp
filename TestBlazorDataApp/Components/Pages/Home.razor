@@ -1,6 +1,7 @@
 ﻿@inherits HomeBase
 @rendermode InteractiveServer
 @page "/"
+@page "/{Param:int}"
 
 <PageTitle>Home</PageTitle>
 
@@ -24,6 +25,8 @@ Welcome to your new app. Your number is @(YourNumber).
     }
 </form>
 
-<p>
-    @TestService.GetEnv()
-</p>
+<div class="mt-4">
+    Env: @TestService.GetEnv()
+    <br />
+    Param: @Param
+</div>
