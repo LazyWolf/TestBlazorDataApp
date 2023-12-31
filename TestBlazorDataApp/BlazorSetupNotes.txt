@@ -1,4 +1,27 @@
-0. Create New Blazor Web App
+0. Init DB
+Command Prompt (elevated maybe)
+	sqllocaldb create test
+
+DB Init MSSQL Script
+	create database TEST_Data
+	create database TEST_Maintenance
+
+	create table TEST_Data.dbo.Things
+	(
+		[Id] bigint IDENTITY PRIMARY KEY NOT NULL,
+		[Text] nvarchar(max) NULL,
+		[ThingStatus] int NOT NULL,
+		[CreatedDateTime] datetime2(7) NOT NULL,
+		[CreatedBy] nvarchar(max) NULL,
+		[UpdatedDateTime] datetime2(7) NULL,
+		[UpdatedBy] nvarchar(max) NULL,
+	)
+
+	insert into TEST_Data.dbo.Things ([Text], [ThingStatus], [CreatedDateTime], [CreatedBy])
+	values ('Test', 0, GETDATE(), 'Seed')
+
+	select * from TEST_Data.dbo.Things
+
 
 1. Add Serilog Packages
 Serilog
