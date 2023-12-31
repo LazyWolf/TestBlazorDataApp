@@ -1,0 +1,6 @@
+﻿<!-- https://github.com/dotnet/sdk/issues/36666 -->
+<Project>
+  <PropertyGroup>
+    <EnableSourceControlManagerQueries>true</EnableSourceControlManagerQueries>
+  </PropertyGroup>
+</Project>

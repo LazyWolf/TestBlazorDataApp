@@ -10,37 +10,48 @@ namespace TestBlazorDataApp.Services
         private readonly DataContext _ctx;
         private readonly ApplicationOptions _appOptions;
 
-        public TestService()
-        {
-            _ctx = new(new());
-            _appOptions = new();
-        }
-
         public TestService(IDbContextFactory<DataContext> dbContextFactory, IOptions<ApplicationOptions> appOptions)
         {
             _ctx = dbContextFactory.CreateDbContext();
             _appOptions = appOptions.Value;
         }
 
-        public int AddOne(int number)
+        public IEnumerable<Thing> GetThings()
         {
-            return number + 1;
+            return _ctx.Things;
         }
 
-        public Thing GetFirstThing()
+        public Thing AddThing(Thing thing)
         {
-            return _ctx.Things.FirstOrDefault() ?? new Thing();
+            _ctx.Add(thing);
+            _ctx.SaveChanges();
+
+            return thing;
+        }
+
+        public Thing RemoveThing(Thing thing)
+        {
+            _ctx.Remove(thing);
+            _ctx.SaveChanges();
+
+            return thing;
+        }
+
+        public void UpdateThing(Thing thing)
+        {
+            _ctx.Things.Update(thing);
+            _ctx.SaveChanges();
+        }
+
+        public void UpdateThings(List<Thing> things)
+        {
+            _ctx.Things.UpdateRange(things);
+            _ctx.SaveChanges();
         }
 
         public string GetEnv()
         {
             return _appOptions.Environment;
-        }
-
-        public void UpdateThing(Thing user)
-        {
-            _ctx.Things.Update(user);
-            _ctx.SaveChanges();
         }
     }
 }

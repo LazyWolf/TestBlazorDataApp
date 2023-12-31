@@ -12,7 +12,7 @@ namespace TestBlazorDataApp.Components
         protected ILogger<PageBase> Logger { get; set; }
 
         [Inject]
-        protected TestService TestService { get; set; } = new();
+        protected TestService TestService { get; set; }
 
         [Inject]
         protected IJSRuntime JsRuntime { get; set; }

@@ -1,0 +1,23 @@
+﻿tr, td, th {
+  border: 1px solid black;
+  padding: .5rem;
+}
+
+.header-row > th:last-of-type,
+.db-row > td:last-of-type {
+  border: none;
+}
+
+tr > *:first-child {
+  min-width: 3rem;
+  text-align: center;
+}
+
+table > tr:last-of-type {
+  background-color: #fd06;
+  height: 2.5rem;
+}
+
+input {
+  width: 10rem;
+}

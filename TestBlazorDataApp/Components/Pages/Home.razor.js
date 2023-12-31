@@ -1,7 +1,3 @@
-﻿$(() => {
-    console.debug('Loaded JS')
-})
-
-function test() {
-    console.debug('Test')
+﻿export function testJs() {
+    console.debug('Test JS Success')
 }

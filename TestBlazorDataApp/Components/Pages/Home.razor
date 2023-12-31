@@ -7,27 +7,55 @@
 
 <h1>Hello, world!</h1>
 
-Welcome to your new app. Your number is @(YourNumber).
+<div>
+    <table>
+        <tr class="header-row">
+            <th>ID</th>
+            <th>TEXT</th>
+        </tr>
 
-<form>
-    <input @bind="FirstThing.Id" disabled />
-    <input @bind="FirstThing.Text" placeholder="Text" />
-    <button type="submit" @onclick="OnSave">Save</button>
+        @foreach (var row in Things.Take(Things.Count() - 1))
+        {
+            <tr class="db-row">
+                <td>@row.Id</td>
+                <td>@row.Text</td>
+            </tr>
+        }
 
-    @if(SaveSuccess == true)
-    {
-        <span class="text-success">Good</span>
-    }
-    else if (SaveSuccess == false)
-    {
-        <span class="text-danger">Bad</span>
-    }
-</form>
+        <tr class="edit-row">
+            @if (Things.Last().Id > 0)
+            {
+                <td>@Things.Last().Id</td>
+            }
+            else
+            {
+                <td>---</td>
+            }
+            <td><input @bind="Things.Last().Text" @bind:event="oninput" placehodler="Text" /></td>
+            <td>
+                <button class="btn btn-danger" @onclick="OnPop">X</button>
+                <button class="btn btn-primary ms-1" @onclick="OnSave">O</button>
+            </td>
+        </tr>
 
-<div class="mt-4">
+    </table>
+    <div class="result-box mt-2">
+        @if(SaveSuccess == true)
+        {
+            <span class="text-success border border-2 border-success p-2">Success</span>
+        }
+        else if (SaveSuccess == false)
+        {
+            <span class="text-danger border border-2 border-danger p-2">Bad Entry</span>
+        }
+    </div>
+
+</div>
+
+<div class="my-4">
     Environment: @TestService.GetEnv()
     <br />
     Route Parameter: @Param
 </div>
 
-<button type="button" @onclick="OnTestJs">Test JS (broken)</button>
+<button type="button" @onclick="OnTestJs">Test JS</button> <sup>&lt; Writes to console.debug, enable 'verbose' log level</sup>

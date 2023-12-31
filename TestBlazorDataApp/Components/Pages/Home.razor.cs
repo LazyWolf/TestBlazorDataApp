@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using System.Reflection;
-using TestBlazorDataApp.Data;
 using TestBlazorDataApp.Data.Models;
 using TestBlazorDataApp.Services;
 
@@ -12,14 +10,13 @@ namespace TestBlazorDataApp.Components.Pages
         [Parameter]
         public int Param { get; set; }
 
-        public int YourNumber { get; set; }
-        public Thing FirstThing { get; set; } = new();
         public bool? SaveSuccess { get; set; }
+        public List<Thing> Things { get; set; } = new();
 
         protected override void OnInitialized()
         {
-            YourNumber = TestService.AddOne(1);
-            FirstThing = TestService.GetFirstThing();
+            Things = TestService.GetThings().ToList();
+            Things.Add(new());
         }
 
         public void OnSave()
@@ -27,7 +24,13 @@ namespace TestBlazorDataApp.Components.Pages
             try
             {
                 Logger.LogInformation("OnSave");
-                TestService.UpdateThing(FirstThing);
+
+                ValidateThing(Things.Last());
+
+                TestService.UpdateThing(Things.Last());
+
+                Things.Add(new());
+
                 SaveSuccess = true;
             }
             catch (Exception)
@@ -36,10 +39,44 @@ namespace TestBlazorDataApp.Components.Pages
             }
         }
 
+        public void OnPop()
+        {
+            Logger.LogInformation("OnSave");
+
+            if (Things.Last().Id > 0)
+            {
+                TestService.RemoveThing(Things.Last());
+            }
+
+            Things.Remove(Things.Last());
+
+            if (Things.Count < 1)
+            {
+                Things.Add(new());
+            }
+
+            SaveSuccess = null;
+        }
+
+        private void ValidateThing(Thing thing)
+        {
+            if (String.IsNullOrWhiteSpace(Things.Last().Text))
+            {
+                throw new Exception();
+            }
+        }
+
         public async Task OnTestJs()
         {
-            // https://learn.microsoft.com/en-us/aspnet/core/blazor/javascript-interoperability/?view=aspnetcore-8.0
-            await JsModule.InvokeVoidAsync("Home.test"); // Call JS function in C#
+            try
+            {
+                // https://learn.microsoft.com/en-us/aspnet/core/blazor/javascript-interoperability/?view=aspnetcore-8.0
+                await JsModule.InvokeVoidAsync("testJs"); // Call JS function in C#
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "OnTestJs error");
+            }
         }
     }
 }
