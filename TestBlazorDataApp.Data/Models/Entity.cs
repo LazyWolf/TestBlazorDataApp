@@ -1,5 +1,5 @@
 ﻿#nullable disable
-namespace TestBlazorDataApp.Data
+namespace TestBlazorDataApp.Data.Models
 {
     public class Entity
     {
@@ -7,7 +7,7 @@ namespace TestBlazorDataApp.Data
         public DateTime CreatedDateTime { get; set; }
             = DateTime.Now;
         public string CreatedBy { get; set; }
-        public DateTime UpdatedDateTime { get; set; }
+        public DateTime? UpdatedDateTime { get; set; }
             = DateTime.Now;
         public string UpdatedBy { get; set; }
     }

@@ -1,4 +1,4 @@
-Create Blazor Web App
+0. Create New Blazor Web App
 
 1. Add Serilog Packages
 Serilog
@@ -11,105 +11,17 @@ Serilog.Sinks.MSSqlServer
 
 [Latest Serilog.Sinks.MSSqlServer adds Azure.Identity version with vulnerability (1.7.0)]
 Upgrate Azure.Identity transitive dependency to latest ver
-Update .proj	
+Update .proj
 	<PropertyGroup>
 	  <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 	  <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 	</PropertyGroup>
 
 2. Creat Serilog Configuration
-Update appsettings.json
-	"Serilog": {
-	  "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.MSSqlServer" ],
-	  "MinimumLevel": {
-		"Default": "Information",
-		"Override": {
-		  "Microsoft": "Error",
-		  "Microsoft.AspNetCore": "Warning",
-		  "Serilog.AspNetCore.RequestLoggingMiddleware": "Warning",
-		  "System": "Error"
-		}
-	  },
-	  "WriteTo": [
-		{
-		  "Name": "MSSqlServer",
-		  "Args": {
-			"connectionString": "Server=(localdb)\\try;Database=TRY_Maintenance;Trusted_Connection=Yes;MultipleActiveResultSets=true",
-			"tableName": "ApplicationLogs",
-			"autoCreateSqlTable": true
-		  }
-		},
-		{
-		  "Name": "File",
-		  "Args": {
-			"path": "Logs/applog-.txt",
-			"rollingInterval": "Day",
-			"rollOnFileSizeLimit": true,
-			"formatter": "Serilog.Formatting.Compact.CompactJsonFormatter, Serilog.Formatting.Compact"
-		  }
-		},
-		{
-		  "Name": "Console"
-		}
-	  ],
-	  "Properties": {
-		"Application": "TestBlazorDataApp",
-		"Environment": "Development"
-	  }
-	}
+Update appsettings.json > "Serilog" section
 
 /Middleware
 	SerilogConfigurator.cs
-		public static class SerilogConfigurator
-		{
-			public static void ConfigureLogging(this LoggerConfiguration cfg, HostBuilderContext ctx)
-			{
-				var selfLogDir = ctx.Configuration["SerilogSelfLogDir"];
-				if (!String.IsNullOrWhiteSpace(selfLogDir))
-				{
-					ctx.ConfigureSelfLogging(selfLogDir);
-				}
-
-				cfg.ReadFrom.Configuration(ctx.Configuration)
-					.Enrich.FromLogContext();
-
-				var logConn = ctx.Configuration.GetConnectionString("DefaultConnection");
-				Log.Logger = new LoggerConfiguration()
-					.ReadFrom.Configuration(ctx.Configuration)
-					.Enrich.FromLogContext()
-					.CreateLogger();
-
-				Log.Information("Serilog configured for {app}: (SqlLog: {logConn}, SelfLog: {selfLogDir})", ctx.HostingEnvironment.ApplicationName, logConn, selfLogDir);
-
-			}
-
-			private static void ConfigureSelfLogging(this HostBuilderContext ctx, string selfLogDir)
-			{
-				try
-				{
-					Directory.CreateDirectory(selfLogDir);
-				}
-				catch { return; }
-
-				var logPrefix = $"selflog-{ctx.HostingEnvironment.ApplicationName}-";
-
-				// Clean out old logs
-				var oldLogs = Directory.EnumerateFiles(selfLogDir)
-					.Where(f => Path.GetFileName(f).StartsWith(logPrefix));
-				foreach ( var oldLog in oldLogs )
-				{
-					try
-					{
-						File.Delete(oldLog);
-					}
-					catch { continue; }
-				}
-
-				var file = File.CreateText(Path.Combine(selfLogDir, logPrefix + DateTime.Now.Ticks + ".log"));
-
-				Serilog.Debugging.SelfLog.Enable(TextWriter.Synchronized(file));
-			}
-		}
 
 3. Update program.cs
 	// Add Services
@@ -138,107 +50,23 @@ Install-Package Microsoft.EntityFrameworkCore.Tools
 /Models
 	Thing.cs
 DataContext.cs
-	public class DataContext : DbContext
-	{
-	    public DataContext(DbContextOptions<DataContext> options)
-	    : base(options)
-	    {
-	    }
-
-	    public DbSet<Thing> Things { get; set; }
-
-	    protected override void OnModelCreating(ModelBuilder modelBuilder)
-	    {
-	        modelBuilder.Entity<Thing>()
-	            .ToTable("Things");
-	
-	        base.OnModelCreating(modelBuilder);
-	    }
-	}
 
 5. Configure Service Layer
 Create "Services" Class Library project
 /Options
 	ApplicationOptions.cs
 SomeService.cs
-	public class SomeService
-	{
-	    private readonly DataContext _ctx;
-	    private readonly ApplicationOptions _appOptions;
-
-	    public SomeService()
-	    {
-	        _ctx = new(new());
-	        _appOptions = new();
-	    }
-
-	    public SomeService(IDbContextFactory<DataContext> dbContextFactory, IOptions<ApplicationOptions> appOptions)
-	    {
-        	_ctx = dbContextFactory.CreateDbContext();
-	        _appOptions = appOptions.Value;
-	    }
-
-	    public int DoSomething()
-	    {
-		_ctx.Thing.Add(new Thing());
-	        _ctx.SaveChanges();
-	    }
-
-	    public string GetEnv()
-	    {
-	        return _appOptions.Environment;
-	    }
-	}
 
 6. Configure razor pages codebehind w/logging, service injection
 /Components/Helpers
 	PageBase.cs
-		    public class PageBase : ComponentBase
-			{
-				[Inject]
-		#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-				protected ILogger<PageBase> Logger { get; set; }
-		#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-
-				[Inject]
-				protected TestService TestService { get; set; } = new();
-			}
 
 Page.razor
 	@inherits HomeBase
 	@rendermode InteractiveServer
 
 Page.razor.cs
-	using Microsoft.AspNetCore.Components;
-	using TestBlazorDataApp.Data;
-	using TestBlazorDataApp.Services;
-
-	namespace SomeApp.Components.Pages
-	{
-	    public class HomeBase : PageBase
-	    {
-	        public int SomeProperty { get; set; }
-			public bool Success { get; set; }
-	
-	        protected override void OnInitialized()
-	        {
-				SomeProperty = 1;
-	        }
-	
-	        public void SomeMethod()
-	        {
-	            try
-	            {
-	                SomeService.DoSomething();
-	                Success = true;
-	            }
-	            catch (Exception)
-	            {
-                	Success = false;
-        	    }
-	        }
-	    }
-	}
+	// do C# stuff
 
 Page.razor.css
 	// do css stuff

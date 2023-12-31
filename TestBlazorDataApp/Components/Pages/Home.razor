@@ -10,9 +10,8 @@
 Welcome to your new app. Your number is @(YourNumber).
 
 <form>
-    <input @bind="FirstUser.Id" disabled />
-    <input @bind="FirstUser.UserName" placeholder="UserName" />
-    <input @bind="FirstUser.Email" placeholder="Email" />
+    <input @bind="FirstThing.Id" disabled />
+    <input @bind="FirstThing.Text" placeholder="Text" />
     <button type="submit" @onclick="OnSave">Save</button>
 
     @if(SaveSuccess == true)
@@ -26,7 +25,9 @@ Welcome to your new app. Your number is @(YourNumber).
 </form>
 
 <div class="mt-4">
-    Env: @TestService.GetEnv()
+    Environment: @TestService.GetEnv()
     <br />
-    Param: @Param
+    Route Parameter: @Param
 </div>
+
+<button type="button" @onclick="OnTestJs">Test JS (broken)</button>

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using TestBlazorDataApp.Data;
+using TestBlazorDataApp.Data.Models;
 
 namespace TestBlazorDataApp.Services
 {
@@ -26,9 +27,9 @@ namespace TestBlazorDataApp.Services
             return number + 1;
         }
 
-        public User GetFirstUser()
+        public Thing GetFirstThing()
         {
-            return _ctx.Users.FirstOrDefault() ?? new User();
+            return _ctx.Things.FirstOrDefault() ?? new Thing();
         }
 
         public string GetEnv()
@@ -36,9 +37,9 @@ namespace TestBlazorDataApp.Services
             return _appOptions.Environment;
         }
 
-        public void UpdateUser(User user)
+        public void UpdateThing(Thing user)
         {
-            _ctx.Users.Update(user);
+            _ctx.Things.Update(user);
             _ctx.SaveChanges();
         }
     }
